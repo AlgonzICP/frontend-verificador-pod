@@ -23,6 +23,9 @@
         <option value="seur">SEUR</option>
     </select>
 
+    <label for="nombreCliente">Introduce el nombre del cliente:</label>
+    <input type="text" id="nombreCliente" placeholder="Ej. Jose Luis Jiménez" />
+
     <button onclick="enviar()">Extraer Nombre y DNI</button>
 
     <div id="resultado"></div>
@@ -31,6 +34,7 @@
         async function enviar() {
             const fileInput = document.getElementById('imagen');
             const transportista = document.getElementById('transportista').value;
+            const nombreCliente = document.getElementById('nombreCliente').value;
             const resultadoDiv = document.getElementById('resultado');
 
             if (fileInput.files.length === 0) {
@@ -38,9 +42,15 @@
                 return;
             }
 
+            if (!nombreCliente.trim()) {
+                alert("Por favor, introduce el nombre del cliente.");
+                return;
+            }
+
             const formData = new FormData();
             formData.append("imagen", fileInput.files[0]);
             formData.append("transportista", transportista);
+            formData.append("nombreCliente", nombreCliente);
 
             resultadoDiv.innerHTML = "⏳ Procesando imagen...";
 
@@ -50,14 +60,13 @@
                     body: formData
                 });
 
-                const data = await response.text();
-                resultadoDiv.innerHTML = `<strong>Resultado:</strong><br>${data}`;
+                const data = await response.json();
+                resultadoDiv.innerHTML = `<strong>Resultado:</strong><br>${data.resultado.replace(/\n/g, "<br>")}<br><br><strong>Nombre esperado:</strong> ${data.nombreEsperado}`;
             } catch (error) {
                 resultadoDiv.innerHTML = "❌ Error al procesar la imagen.";
                 console.error(error);
             }
         }
-        
     </script>
 </body>
 </html>
